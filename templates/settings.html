@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% from "_macros.html" import pill %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<h1 class="page-title">Settings</h1>
+<div class="grid2">
+  <section class="card">
+    <h2>System</h2>
+    <ul class="status-list">
+      <li><span>System name</span><em>ReFound</em></li>
+      <li><span>Device</span><em>Raspberry Pi 3 Model B+</em></li>
+      <li><span>Camera</span>{{ pill(status.camera_online, 'Connected', 'Offline') }}</li>
+      <li><span>Sensors (IR)</span>{{ pill(status.ir_active, 'Active', 'Inactive') }}</li>
+      <li><span>OLED display</span>{{ pill(status.oled_online, 'Online', 'Offline') }}</li>
+      <li><span>Database</span>{{ pill(status.database_online, 'Connected', 'Offline') }}</li>
+      <li><span>Uptime</span><em>{{ status.uptime_seconds|uptime }}{% if status.mode == 'simulated' %} (simulated){% endif %}</em></li>
+      <li><span>Data source</span><em>{{ status.mode|capitalize }}</em></li>
+    </ul>
+  </section>
+  <section class="card">
+    <h2>Demo mode</h2>
+    <p>Demo mode is <strong>{{ 'ON' if demo_mode else 'OFF' }}</strong>. When ON, hardware status is simulated and you can fake detections for presentations.</p>
+    <div class="btn-row">
+      <form method="post" action="{{ url_for('toggle_demo') }}"><button class="btn">Turn demo mode {{ 'OFF' if demo_mode else 'ON' }}</button></form>
+      <form method="post" action="{{ url_for('demo_load') }}"><button class="btn ghost dark">Load demo data</button></form>
+    </div>
+  </section>
+</div>
+<section class="card">
+  <h2>About the project</h2>
+  <p>ReFound is an IoT-based smart lost-and-found system. A Raspberry Pi 3 Model B+ with a camera, IR sensor, push button, buzzer, LEDs and an OLED display detects items. It sends them to this Flask backend, which stores them in SQLite and shows them on this dashboard.</p>
+  <p class="note">The Raspberry Pi connects through <code>POST /api/detection</code> and <code>POST /api/system-status</code> (see README.md).</p>
+</section>
+{% endblock %}

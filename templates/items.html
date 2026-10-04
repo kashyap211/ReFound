@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge %}
+{% block title %}Items{% endblock %}
+{% block content %}
+<h1 class="page-title">Items</h1>
+<form class="card filters" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search name, description or location">
+  <select name="category"><option value="">All categories</option>
+    {% for c in CATEGORIES %}<option {{ 'selected' if c == cat }}>{{ c }}</option>{% endfor %}</select>
+  <select name="status"><option value="">All statuses</option>
+    {% for s in STATUSES %}<option {{ 'selected' if s == st }}>{{ s }}</option>{% endfor %}</select>
+  <select name="sort">
+    {% for v, l in [('newest','Newest first'),('oldest','Oldest first'),('name','Name A-Z'),('status','Status')] %}
+    <option value="{{ v }}" {{ 'selected' if v == sort }}>{{ l }}</option>{% endfor %}</select>
+  <button class="btn">Apply</button>
+  <a class="btn ghost dark" href="{{ url_for('items') }}">Reset</a>
+</form>
+
+{% if items %}
+<div class="cards">
+  {% for it in items %}
+  <article class="card item">
+    <img src="{{ img_url(it.image_filename) }}" alt="Photo of {{ it.name }}">
+    <div class="item-body">
+      <div class="row"><h3>{{ it.name }}</h3>{{ badge(it.status) }}</div>
+      <p class="muted">{{ it.category }} &middot; {{ it.location or 'Location not set' }}</p>
+      <p class="muted">{{ it.date_detected }} at {{ it.time_detected[:5] }}</p>
+      <p>{{ it.description or 'No description.' }}</p>
+      <a class="btn small" href="{{ url_for('item_detail', item_id=it.id) }}">View details</a>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card empty">No items match your search. Change the filters or add a new item below.</div>
+{% endif %}
+
+<details class="card" id="add">
+  <summary><strong>Add a new item</strong></summary>
+  <form method="post" action="{{ url_for('add_item') }}" enctype="multipart/form-data" class="form">
+    <label>Item name *<input name="name" required maxlength="100"></label>
+    <label>Category<select name="category">{% for c in CATEGORIES %}<option>{{ c }}</option>{% endfor %}</select></label>
+    <label>Status<select name="status">{% for s in STATUSES %}<option>{{ s }}</option>{% endfor %}</select></label>
+    <label>Location<input name="location" maxlength="100" placeholder="e.g. Room 101"></label>
+    <label class="full">Description<textarea name="description" rows="2" maxlength="500"></textarea></label>
+    <label class="full">Notes<textarea name="notes" rows="2" maxlength="500"></textarea></label>
+    <label class="full">Photo (PNG, JPG, GIF or WEBP, max 5 MB)<input type="file" name="image" accept="image/*"></label>
+    <button class="btn">Save item</button>
+  </form>
+</details>
+{% endblock %}

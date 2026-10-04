@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge %}
+{% block title %}{{ item.name }}{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('items') }}">&larr; Back to items</a>
+<section class="card detail">
+  <img class="big" src="{{ img_url(item.image_filename) }}" alt="Photo of {{ item.name }}">
+  <div>
+    <div class="row"><h1>{{ item.name }}</h1>{{ badge(item.status) }}</div>
+    <dl class="facts">
+      <dt>Detection ID</dt><dd>{{ detections[0].id|det_id if detections else 'N/A' }}</dd>
+      <dt>Category</dt><dd>{{ item.category }}</dd>
+      <dt>Date detected</dt><dd>{{ item.date_detected }}</dd>
+      <dt>Time detected</dt><dd>{{ item.time_detected }}</dd>
+      <dt>Location</dt><dd>{{ item.location or '-' }}</dd>
+      <dt>Description</dt><dd>{{ item.description or '-' }}</dd>
+      <dt>Notes</dt><dd>{{ item.notes or 'No notes.' }}</dd>
+    </dl>
+    <div class="btn-row">
+      <form method="post" action="{{ url_for('update_status', item_id=item.id) }}"><input type="hidden" name="status" value="Claimed"><button class="btn">Mark as Claimed</button></form>
+      <form method="post" action="{{ url_for('update_status', item_id=item.id) }}"><input type="hidden" name="status" value="Pending"><button class="btn ghost dark">Mark as Pending</button></form>
+      <form method="post" action="{{ url_for('delete_item', item_id=item.id) }}" data-confirm="Delete '{{ item.name }}' permanently?"><button class="btn danger">Delete Item</button></form>
+    </div>
+  </div>
+</section>
+{% endblock %}

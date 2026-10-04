@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% from "_macros.html" import pill, badge %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <h1>Welcome to ReFound</h1>
+    <p>Smart Lost &amp; Found Detection System</p>
+  </div>
+  <div class="hero-actions">
+    <form method="post" action="{{ url_for('demo_simulate') }}"><button class="btn light">Simulate a detection</button></form>
+    <a class="btn ghost" href="{{ url_for('items') }}#add">Add item</a>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="card stat"><span>Total Items</span><b>{{ stats.total }}</b></div>
+  <div class="card stat"><span>Items Found</span><b>{{ stats.found }}</b></div>
+  <div class="card stat"><span>Items Pending</span><b>{{ stats.pending }}</b></div>
+  <div class="card stat"><span>Today's Detections</span><b>{{ stats.today }}</b></div>
+</section>
+
+<div class="grid2">
+  <section class="card">
+    <h2>Recent Detections</h2>
+    {% if recent %}
+    <div class="table-wrap"><table>
+      <thead><tr><th>Photo</th><th>Item</th><th>Date</th><th>Time</th><th>Location</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for d in recent %}
+      <tr>
+        <td><img class="thumb" src="{{ img_url(d.image_filename) }}" alt=""></td>
+        <td><strong>{{ d.name }}</strong></td>
+        <td>{{ d.detected_at[:10] }}</td><td>{{ d.detected_at[11:16] }}</td>
+        <td>{{ d.location or '-' }}</td><td>{{ badge(d.item_status) }}</td>
+        <td><a class="btn small" href="{{ url_for('item_detail', item_id=d.item_id) }}">View</a></td>
+      </tr>
+      {% endfor %}
+      </tbody></table></div>
+    {% else %}
+    <div class="empty">No detections yet. Use "Simulate a detection" or load the demo data.
+      <form method="post" action="{{ url_for('demo_load') }}"><button class="btn">Load demo data</button></form></div>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>System Status {% if status.mode == 'simulated' %}<span class="tag">Simulated</span>{% elif status.mode == 'live' %}<span class="tag live">Live from Pi</span>{% endif %}</h2>
+    <ul class="status-list">
+      <li><span>Raspberry Pi</span>{{ pill(status.pi_online, 'Connected', 'Offline') }}</li>
+      <li><span>Camera</span>{{ pill(status.camera_online, 'Connected', 'Offline') }}</li>
+      <li><span>IR Sensor</span>{{ pill(status.ir_active, 'Active', 'Inactive') }}</li>
+      <li><span>Database</span>{{ pill(status.database_online, 'Connected', 'Offline') }}</li>
+      <li><span>Last detection</span><em>{{ status.last_detection or 'None yet' }}</em></li>
+    </ul>
+    {% if status.mode != 'live' %}<p class="note">No Raspberry Pi has reported in yet, so these values are not from real hardware.</p>{% endif %}
+  </section>
+</div>
+
+<section class="card">
+  <h2>About ReFound</h2>
+  <p>ReFound is an IoT-based lost-and-found system. A Raspberry Pi with a camera and IR sensor spots an object, saves its photo and details, and sends them to this dashboard so the owner can be found.</p>
+  <ol class="flow">
+    <li>Raspberry Pi</li><li>Sensors / Camera</li><li>Detection</li><li>Database</li><li>Flask Backend</li><li>Web Dashboard</li>
+  </ol>
+</section>
+{% endblock %}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Dashboard{% endblock %} - ReFound</title>
+  <link rel="icon" href="{{ url_for('static', filename='images/placeholder.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="{{ url_for('dashboard') }}">
+      <span class="logo">R</span>
+      <span class="brand-text"><strong>ReFound</strong><small>Find it. Track it. Reunite it.</small></span>
+    </a>
+    <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">&#9776;</button>
+    <nav id="nav">
+      {% for ep, label in [('dashboard','Dashboard'),('items','Items'),('detections','Detections'),('settings','Settings')] %}
+      <a href="{{ url_for(ep) }}" class="{{ 'active' if request.endpoint == ep or (ep == 'items' and request.endpoint == 'item_detail') }}">{{ label }}</a>
+      {% endfor %}
+    </nav>
+  </div>
+</header>
+{% if demo_mode %}<div class="demo-banner">Demo mode is ON: hardware values and sample items are simulated.</div>{% endif %}
+<main class="wrap">
+  {% for category, message in get_flashed_messages(with_categories=true) %}
+  <div class="flash {{ category }}">{{ message }}</div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</main>
+<footer class="wrap foot">ReFound &middot; IoT-based Smart Lost &amp; Found System &middot; College project prototype</footer>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

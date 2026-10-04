@@ -1,0 +1,2 @@
+{% macro pill(on, yes, no) %}<span class="pill {{ 'ok' if on else 'off' }}">{{ yes if on else no }}</span>{% endmacro %}
+{% macro badge(status) %}<span class="badge s-{{ status|lower }}">{{ status }}</span>{% endmacro %}
